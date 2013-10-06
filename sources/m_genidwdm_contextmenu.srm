@@ -1,0 +1,432 @@
+﻿$PBExportHeader$m_genidwdm_contextmenu.srm
+forward
+global type m_genidwdm_contextmenu from menu
+end type
+type m_dynaitem from menu within m_genidwdm_contextmenu
+end type
+type m_dynasubitem from menu within m_dynaitem
+end type
+type m_dynaitem from menu within m_genidwdm_contextmenu
+m_dynasubitem m_dynasubitem
+end type
+type m_addtoexpression from menu within m_genidwdm_contextmenu
+end type
+type m_destroy from menu within m_genidwdm_contextmenu
+end type
+type m_changeband from menu within m_genidwdm_contextmenu
+end type
+type m_inspect from menu within m_genidwdm_contextmenu
+end type
+type m_createsyntax from menu within m_genidwdm_contextmenu
+end type
+type m_sep1 from menu within m_genidwdm_contextmenu
+end type
+type m_refresh from menu within m_genidwdm_contextmenu
+end type
+global type m_genidwdm_contextmenu from menu
+m_dynaitem m_dynaitem
+m_addtoexpression m_addtoexpression
+m_destroy m_destroy
+m_changeband m_changeband
+m_inspect m_inspect
+m_createsyntax m_createsyntax
+m_sep1 m_sep1
+m_refresh m_refresh
+end type
+end forward
+
+global type m_genidwdm_contextmenu from menu
+m_dynaitem m_dynaitem
+m_addtoexpression m_addtoexpression
+m_destroy m_destroy
+m_changeband m_changeband
+m_inspect m_inspect
+m_createsyntax m_createsyntax
+m_sep1 m_sep1
+m_refresh m_refresh
+end type
+global m_genidwdm_contextmenu m_genidwdm_contextmenu
+
+type variables
+protected menu im_itemclicked
+protected menu im_dynaitems[]
+end variables
+
+forward prototypes
+public subroutine setclickeditem (menu am_item)
+public function menu getclickeditem ()
+public function menu addmenuitem (menu am_parent, string as_text, string as_tag, boolean ab_enabled, boolean ab_checked)
+public subroutine cleanup ()
+end prototypes
+
+public subroutine setclickeditem (menu am_item);im_itemclicked = am_item
+end subroutine
+
+public function menu getclickeditem ();return im_itemclicked
+end function
+
+public function menu addmenuitem (menu am_parent, string as_text, string as_tag, boolean ab_enabled, boolean ab_checked);m_dynaitem lm
+lm = create m_dynaitem
+im_dynaitems[ upperbound(im_dynaitems[]) +1 ] = lm
+lm.m_dynasubitem.text = as_text
+lm.m_dynasubitem.tag = as_tag
+lm.m_dynasubitem.checked = ab_checked
+lm.m_dynasubitem.enabled = ab_enabled
+am_parent.item[ upperbound( am_parent.item[] ) + 1 ] = lm.m_dynasubitem
+return lm.m_dynasubitem
+end function
+
+public subroutine cleanup ();long i, count
+count = upperbound( im_dynaitems[] )
+for i = 1 to count
+	destroy im_dynaitems[ i ]
+next
+end subroutine
+
+on m_genidwdm_contextmenu.create
+m_genidwdm_contextmenu=this
+call super::create
+this.text = "m_genidwdm_contextmenu"
+this.menustyle = contemporarymenu!
+this.menutextcolor = 134217735
+this.menubackcolor = 134217732
+this.menuhighlightcolor = 134217741
+this.textsize = 8
+this.weight = 400
+this.facename = "Tahoma"
+this.titlebackcolor = 134217730
+this.bitmapbackcolor = 12632256
+this.menubitmaps = true
+this.titlegradient = true
+this.toolbartextcolor = 134217746
+this.toolbarbackcolor = 67108864
+this.toolbarhighlightcolor = 134217741
+this.toolbargradient = true
+this.bitmapgradient = true
+this.m_dynaitem=create m_dynaitem
+this.m_addtoexpression=create m_addtoexpression
+this.m_destroy=create m_destroy
+this.m_changeband=create m_changeband
+this.m_inspect=create m_inspect
+this.m_createsyntax=create m_createsyntax
+this.m_sep1=create m_sep1
+this.m_refresh=create m_refresh
+this.Item[UpperBound(this.Item)+1]=this.m_dynaitem
+this.Item[UpperBound(this.Item)+1]=this.m_addtoexpression
+this.Item[UpperBound(this.Item)+1]=this.m_destroy
+this.Item[UpperBound(this.Item)+1]=this.m_changeband
+this.Item[UpperBound(this.Item)+1]=this.m_inspect
+this.Item[UpperBound(this.Item)+1]=this.m_createsyntax
+this.Item[UpperBound(this.Item)+1]=this.m_sep1
+this.Item[UpperBound(this.Item)+1]=this.m_refresh
+end on
+
+on m_genidwdm_contextmenu.destroy
+call super::destroy
+destroy(this.m_dynaitem)
+destroy(this.m_addtoexpression)
+destroy(this.m_destroy)
+destroy(this.m_changeband)
+destroy(this.m_inspect)
+destroy(this.m_createsyntax)
+destroy(this.m_sep1)
+destroy(this.m_refresh)
+end on
+
+type m_dynaitem from menu within m_genidwdm_contextmenu
+m_dynasubitem m_dynasubitem
+end type
+
+event clicked;setClickedItem( this )
+end event
+
+on m_dynaitem.create
+call super::create
+this.visible = false
+this.text = "dynaitem"
+this.menustyle = contemporarymenu!
+this.menutextcolor = 134217735
+this.menubackcolor = 134217732
+this.menuhighlightcolor = 134217741
+this.textsize = 8
+this.weight = 400
+this.facename = "Tahoma"
+this.titlebackcolor = 134217730
+this.bitmapbackcolor = 12632256
+this.menubitmaps = true
+this.titlegradient = true
+this.toolbartextcolor = 134217746
+this.toolbarbackcolor = 67108864
+this.toolbarhighlightcolor = 134217741
+this.toolbargradient = true
+this.bitmapgradient = true
+this.m_dynasubitem=create m_dynasubitem
+this.Item[UpperBound(this.Item)+1]=this.m_dynasubitem
+end on
+
+on m_dynaitem.destroy
+call super::destroy
+destroy(this.m_dynasubitem)
+end on
+
+type m_dynasubitem from menu within m_dynaitem
+end type
+
+on m_dynasubitem.create
+call super::create
+this.text = "dynasubitem"
+this.menustyle = contemporarymenu!
+this.menutextcolor = 134217735
+this.menubackcolor = 134217732
+this.menuhighlightcolor = 134217741
+this.textsize = 8
+this.weight = 400
+this.facename = "Tahoma"
+this.titlebackcolor = 134217730
+this.bitmapbackcolor = 12632256
+this.menubitmaps = true
+this.titlegradient = true
+this.toolbartextcolor = 134217746
+this.toolbarbackcolor = 67108864
+this.toolbarhighlightcolor = 134217741
+this.toolbargradient = true
+this.bitmapgradient = true
+end on
+
+on m_dynasubitem.destroy
+call super::destroy
+end on
+
+event clicked;setClickedItem( this )
+end event
+
+type m_addtoexpression from menu within m_genidwdm_contextmenu
+end type
+
+on m_addtoexpression.create
+call super::create
+this.tag = "add"
+this.text = "Add to expression"
+this.toolbaritemname = "insert5!"
+this.menuimage = "insert5!"
+this.menustyle = contemporarymenu!
+this.menutextcolor = 134217735
+this.menubackcolor = 134217732
+this.menuhighlightcolor = 134217741
+this.textsize = 8
+this.weight = 400
+this.facename = "Tahoma"
+this.titlebackcolor = 134217730
+this.bitmapbackcolor = 12632256
+this.menubitmaps = true
+this.titlegradient = true
+this.toolbartextcolor = 134217746
+this.toolbarbackcolor = 67108864
+this.toolbarhighlightcolor = 134217741
+this.toolbargradient = true
+this.bitmapgradient = true
+end on
+
+on m_addtoexpression.destroy
+call super::destroy
+end on
+
+event clicked;setClickedItem( this )
+end event
+
+type m_destroy from menu within m_genidwdm_contextmenu
+end type
+
+on m_destroy.create
+call super::create
+this.tag = "destroy"
+this.text = "Destroy"
+this.toolbaritemname = "custom080!"
+this.menuimage = "custom080!"
+this.menustyle = contemporarymenu!
+this.menutextcolor = 134217735
+this.menubackcolor = 134217732
+this.menuhighlightcolor = 134217741
+this.textsize = 8
+this.weight = 400
+this.facename = "Tahoma"
+this.titlebackcolor = 134217730
+this.bitmapbackcolor = 12632256
+this.menubitmaps = true
+this.titlegradient = true
+this.toolbartextcolor = 134217746
+this.toolbarbackcolor = 67108864
+this.toolbarhighlightcolor = 134217741
+this.toolbargradient = true
+this.bitmapgradient = true
+end on
+
+on m_destroy.destroy
+call super::destroy
+end on
+
+event clicked;setClickedItem( this )
+end event
+
+type m_changeband from menu within m_genidwdm_contextmenu
+end type
+
+on m_changeband.create
+call super::create
+this.text = "Change band"
+this.toolbaritemname = "bringtofront!"
+this.menuimage = "bringtofront!"
+this.menustyle = contemporarymenu!
+this.menutextcolor = 134217735
+this.menubackcolor = 134217732
+this.menuhighlightcolor = 134217741
+this.textsize = 8
+this.weight = 400
+this.facename = "Tahoma"
+this.titlebackcolor = 134217730
+this.bitmapbackcolor = 12632256
+this.menubitmaps = true
+this.titlegradient = true
+this.toolbartextcolor = 134217746
+this.toolbarbackcolor = 67108864
+this.toolbarhighlightcolor = 134217741
+this.toolbargradient = true
+this.bitmapgradient = true
+end on
+
+on m_changeband.destroy
+call super::destroy
+end on
+
+type m_inspect from menu within m_genidwdm_contextmenu
+end type
+
+event clicked;setClickedItem( this )
+end event
+
+on m_inspect.create
+call super::create
+this.tag = "inspect"
+this.text = "Inspect"
+this.toolbaritemname = "debug!"
+this.menuimage = "debug!"
+this.menustyle = contemporarymenu!
+this.menutextcolor = 134217735
+this.menubackcolor = 134217732
+this.menuhighlightcolor = 134217741
+this.textsize = 8
+this.weight = 400
+this.facename = "Tahoma"
+this.titlebackcolor = 134217730
+this.bitmapbackcolor = 12632256
+this.menubitmaps = true
+this.titlegradient = true
+this.toolbartextcolor = 134217746
+this.toolbarbackcolor = 67108864
+this.toolbarhighlightcolor = 134217741
+this.toolbargradient = true
+this.bitmapgradient = true
+end on
+
+on m_inspect.destroy
+call super::destroy
+end on
+
+type m_createsyntax from menu within m_genidwdm_contextmenu
+end type
+
+on m_createsyntax.create
+call super::create
+this.tag = "create"
+this.text = "Create syntax"
+this.microhelp = "To be implemented in a futur version"
+this.toolbaritemname = "designmode!"
+this.menuimage = "designmode!"
+this.menustyle = contemporarymenu!
+this.menutextcolor = 134217735
+this.menubackcolor = 134217732
+this.menuhighlightcolor = 134217741
+this.textsize = 8
+this.weight = 400
+this.facename = "Tahoma"
+this.titlebackcolor = 134217730
+this.bitmapbackcolor = 12632256
+this.menubitmaps = true
+this.titlegradient = true
+this.toolbartextcolor = 134217746
+this.toolbarbackcolor = 67108864
+this.toolbarhighlightcolor = 134217741
+this.toolbargradient = true
+this.bitmapgradient = true
+end on
+
+on m_createsyntax.destroy
+call super::destroy
+end on
+
+event clicked;setClickedItem( this )
+end event
+
+type m_sep1 from menu within m_genidwdm_contextmenu
+end type
+
+on m_sep1.create
+call super::create
+this.text = "-"
+this.enabled = false
+this.menustyle = contemporarymenu!
+this.menutextcolor = 134217735
+this.menubackcolor = 134217732
+this.menuhighlightcolor = 134217741
+this.textsize = 8
+this.weight = 400
+this.facename = "Tahoma"
+this.titlebackcolor = 134217730
+this.bitmapbackcolor = 12632256
+this.menubitmaps = true
+this.titlegradient = true
+this.toolbartextcolor = 134217746
+this.toolbarbackcolor = 67108864
+this.toolbarhighlightcolor = 134217741
+this.toolbargradient = true
+this.bitmapgradient = true
+end on
+
+on m_sep1.destroy
+call super::destroy
+end on
+
+type m_refresh from menu within m_genidwdm_contextmenu
+end type
+
+event clicked;setClickedItem( this )
+end event
+
+on m_refresh.create
+call super::create
+this.tag = "refresh"
+this.text = "Refresh"
+this.toolbaritemname = "regenerate!"
+this.menuimage = "regenerate!"
+this.menustyle = contemporarymenu!
+this.menutextcolor = 134217735
+this.menubackcolor = 134217732
+this.menuhighlightcolor = 134217741
+this.textsize = 8
+this.weight = 400
+this.facename = "Tahoma"
+this.titlebackcolor = 134217730
+this.bitmapbackcolor = 12632256
+this.menubitmaps = true
+this.titlegradient = true
+this.toolbartextcolor = 134217746
+this.toolbarbackcolor = 67108864
+this.toolbarhighlightcolor = 134217741
+this.toolbargradient = true
+this.bitmapgradient = true
+end on
+
+on m_refresh.destroy
+call super::destroy
+end on
+

@@ -9,7 +9,7 @@ It save me time in a lot of situations from 2007 where I start to write it :-)
 In two lines of code you can show the DWDebugger with a datawindow "dw_1":
 
   	w_genidwdm_dwdebugger lw_modal
-		openwithparm(lw_modal, dw_1 )
+	openwithparm(lw_modal, dw_1 )
 
 In order to incorporate in your application you must:
 
@@ -19,7 +19,7 @@ In order to incorporate in your application you must:
 Take a look at the sample workspace for more details.
 
 - under "Artistic License".
-- relying on pbnihash, pbniregex, pbnicw and pbnilist; all are open source available at http://sebastien.kirche.free.fr/powerbuilder/en.html
+- relying on pbniregex, pbnicw and pbnilist; all are open source available at http://sebastien.kirche.free.fr/powerbuilder/en.html
 - powerfilter enable (just put your copie of powerfilter.pbd in the project library list) see http://www.powertothebuilder.com/powerfilter.aspx
 - can be linked with embeddingperl to script application (even at runtime) see http://www.embeddingperl.com
 
