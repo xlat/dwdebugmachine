@@ -1,0 +1,18 @@
+HA$PBExportHeader$make_dist.srj
+EXE:.\dwdebugmachine105.exe,,0,0,1
+CMP:0,0,0,2,0,0
+COM:GeNi
+DES:http://geni.embeddingperl.com
+CPY:(c) 2011,2013 - Artistic license
+PRD:Datawindow DebugMachine Test app
+PVS:2,5,0,0
+PVN:2,5,0,0
+FVS:2,5,0,0
+FVN:2,5,0,0
+PBD:C:\Developpement\gits\dwdebugmachine\dwdebugmachine105.pbl,,1
+PBD:C:\Developpement\gits\dwdebugmachine\geni_dwdm105.pbl,,1
+PBD:C:\Developpement\gits\dwdebugmachine\pbnicw.pbd,,0
+PBD:C:\Developpement\gits\dwdebugmachine\pbnilist105.pbd,,0
+PBD:C:\Developpement\gits\dwdebugmachine\pbniregex105.pbd,,0
+PBD:C:\Developpement\gits\dwdebugmachine\powerfilter.pbd,,0
+PBD:c:\developpement\gits\dwdebugmachine\embeddingperl105.pbd,,0

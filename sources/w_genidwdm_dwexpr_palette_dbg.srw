@@ -1,4 +1,4 @@
-﻿$PBExportHeader$w_genidwdm_dwexpr_palette_dbg.srw
+HA$PBExportHeader$w_genidwdm_dwexpr_palette_dbg.srw
 forward
 global type w_genidwdm_dwexpr_palette_dbg from w_genidwdm_dwdebugger
 end type

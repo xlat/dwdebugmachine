@@ -1,0 +1,16 @@
+Save Format v3.0(19990112)
+@begin Libraries
+ "geni_dwdm105.pbl" "";
+@end;
+@begin Objects
+ "nv_genidwdm_auto_resizer.sru" "geni_dwdm105.pbl";
+ "w_genidwdm_dwdebugger.srw" "geni_dwdm105.pbl";
+ "u_genidwdm_dwescilexer.sru" "geni_dwdm105.pbl";
+ "u_genidwdm_scilexer.sru" "geni_dwdm105.pbl";
+ "nv_genidwdm_data_adapter.sru" "geni_dwdm105.pbl";
+ "m_genidwdm_contextmenu.srm" "geni_dwdm105.pbl";
+ "w_genidwdm_dwexpr_palette_dbg.srw" "geni_dwdm105.pbl";
+ "u_genidwdm_splitbar_vertical.sru" "geni_dwdm105.pbl";
+ "w_genidwdm_response_ancestor.srw" "geni_dwdm105.pbl";
+ "u_genidwdm_splitbar_horizontal.sru" "geni_dwdm105.pbl";
+@end;

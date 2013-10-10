@@ -1,4 +1,4 @@
-﻿$PBExportHeader$w_genidwdm_dwdebugger.srw
+HA$PBExportHeader$w_genidwdm_dwdebugger.srw
 forward
 global type w_genidwdm_dwdebugger from w_genidwdm_response_ancestor
 end type
@@ -504,7 +504,7 @@ uo_expression.of_settext( idw_obj.tag )
 st_dataobject.text += " " + idw_obj.dataobject
 //this.Title += "(" + getfullqualifiedname( idw_obj ) + ")"
 //uo_expression.of_setlanguage( "dwexpr" ) // <=== enlever ceci quand ce qui suit fonctionnera
-//ICI, ajout de mot clÃ©s reconnus...
+//ICI, ajout de mot cl$$HEX2$$c300a900$$ENDHEX$$s reconnus...
 //On pourra ajouter les Controls/Bands en tant que TABLES et les attributs en tant que COLUMNS
 constant long SQL_KEYWORDS_LIST                 = 0
 constant long SQL_DATATYPES_LIST                = 1
@@ -1043,18 +1043,19 @@ if ib_dwsyntax <> tab_views.tabpage_console.rb_dw.checked then
 			of_init_n_perl( )
 		end if
 		uo_expression.of_set_perl( )
-		uo_expression.of_settext( "#welcome to intergrated Perl console~r~n &
-$row = $dw->Insertrow(0);~r~n &
-$dw->SetItem($row, 'col_id', $row );~r~n &
-$dw->SetItem($row, 'col_label', 'from perl' );~r~n &
-$dw->SetItem($row, 'col_dec', 42/12.5 );~r~n &
-$dw->SetItem($row, 'col_date', Today() );~r~n &
-$dwc = Powerbuilder::Object->new('datawindowchild');~r~n &
-if($dw->GetChild( 'col_code', $dwc) == 1){~r~n &
-	$dw->SetItem($row, 'col_code', $dwc->GetItemString( 1, 1 ) );~r~n &
-}~r~n &
-else{~r~n &
-    Messagebox('test',  'Could not get dwc !\n' . $dw->DUMP(qr/datawindowchild/));~r~n &
+		uo_expression.of_settext( "#welcome to intergrated Perl console~r~n&
+BEGIN{ push @INC, 'c:/embeddingperl/perl/site/lib', 'c:/embeddingperl/perl/lib' } use Carp::Always;~r~n&
+$row = $dw->Insertrow(0);~r~n&
+$dw->SetItem($row, 'col_id', $row );~r~n&
+$dw->SetItem($row, 'col_label', 'from perl' );~r~n&
+$dw->SetItem($row, 'col_dec', 42/12.5 );~r~n&
+$dw->SetItem($row, 'col_date', Today() );~r~n&
+$dwc = Powerbuilder::Object->new('datawindowchild');~r~n&
+if($dw->GetChild( 'col_code', $dwc) == 1){~r~n&
+	$dw->SetItem($row, 'col_code', $dwc->GetItemString( 1, 1 ) );~r~n&
+}~r~n&
+else{~r~n&
+    Messagebox('test',  'Could not get dwc !\n' . $dw->DUMP(qr/datawindowchild/));~r~n&
 }" )
 	end if
 end if
@@ -1125,23 +1126,23 @@ idw_obj.modify("datawindow.NoUserPrompt='"+ls_before+"'")
 end subroutine
 
 public subroutine of_init_n_perl ();setPointer( HourGlass!)
-long ll_hfile
-constant string C_KEY_FILENAME = "embeddingperl.key"
-//read registration key from a the file embeddingperl.key
-if FileExists(C_KEY_FILENAME) then
-	long ll_tabidx
-	string ls_key
-	ll_hfile = FileOpen(C_KEY_FILENAME, LineMode!, Read!)
-	if ll_hfile > 0 then
-		if FileRead( ll_hfile, ls_key) > 0 then
-			ll_tabidx = pos( ls_key, "~t")
-			if ll_tabidx > 0 then
-				/*DYNAMIC*/ register_embeddingperl(left(ls_key, ll_tabidx -1), mid(ls_key, ll_tabidx+1) )
-			end if
-		end if
-		FileClose( ll_hfile )
-	end if
-end if
+//long ll_hfile
+//constant string C_KEY_FILENAME = "embeddingperl.key"
+////read registration key from a the file embeddingperl.key
+//if FileExists(C_KEY_FILENAME) then
+//	long ll_tabidx
+//	string ls_key
+//	ll_hfile = FileOpen(C_KEY_FILENAME, LineMode!, Read!)
+//	if ll_hfile > 0 then
+//		if FileRead( ll_hfile, ls_key) > 0 then
+//			ll_tabidx = pos( ls_key, "~t")
+//			if ll_tabidx > 0 then
+//				register_embeddingperl(left(ls_key, ll_tabidx -1), mid(ls_key, ll_tabidx+1) )
+//			end if
+//		end if
+//		FileClose( ll_hfile )
+//	end if
+//end if
 in_perl = create using "n_perl"
 in_perl.DYNAMIC open( { "dwdebugmachine", "-e", "0" })
 in_perl.DYNAMIC use( "Powerbuilder", "qw(:all)" )
@@ -1226,7 +1227,7 @@ if TypeExists("u_genidwdm_cst_band") then
 end if
 
 tab_views.tabpage_data.pb_autofilter.visible = TypeExists("n_cst_powerfilter")
-tab_views.tabpage_console.	rb_perl.enabled= TypeExists("n_perl")
+tab_views.tabpage_console.rb_perl.enabled = NOT IsNull(FindClassDefinition("register_embeddingperl"))
 /***
  * TODO :
  *		- historiser les logs sur la machine (./dwdebugmachine_histo.xml par exemple )
@@ -1237,7 +1238,10 @@ if NOT sb_modify_debug_show_msg then
 	close( this )
 	return
 end if
+
 super::event open()
+//Generate Code for resizer.
+if ib_resize_handler then inv_resizer.of_generate_code( "", this )
 
 //LazyRefactoring
 dw_buffer = tab_views.tabpage_data._dw_buffer
@@ -1339,6 +1343,7 @@ if windowtype = Popup! then
 	end if
 end if
 uo_expression.POST setFocus( )
+
 ib_opened = true
 end event
 
@@ -1346,6 +1351,423 @@ event resize;call super::resize;if lb_functions.visible then
 //	lb_functions.bringtotop = true
 	lb_functions.visible = false
 end if
+
+if ib_resize_handler then return
+/* Auto generated code from nv_genidwdm_auto_resizer */
+/* - does NOT handle dynamic created object */
+/* - does NOT handle H/V splitters */
+this.setredraw( false )
+//inv_resizer.event resize( sizetype, width, height )
+if newwidth = 0 and newheight = 0 then return 0
+long /*ll_x, ll_y,*/ ll_width, ll_height
+long ll_parent_x, ll_parent_y, ll_parent_width, ll_parent_height
+newwidth = this.width
+newheight = this.height
+/*ll_x = this.st_vsplit.x*/
+/*ll_y = this.st_vsplit.y*/
+/*ll_width = this.st_vsplit.width*/
+/*ll_height = this.st_vsplit.height*/
+this.st_vsplit.height = newheight - 4 - 200
+newwidth = this.width
+newheight = this.height
+/*ll_x = this.sle_quickfilter.x*/
+/*ll_y = this.sle_quickfilter.y*/
+/*ll_width = this.sle_quickfilter.width*/
+/*ll_height = this.sle_quickfilter.height*/
+newwidth = this.width
+newheight = this.height
+/*ll_x = this.tab_views.x*/
+/*ll_y = this.tab_views.y*/
+/*ll_width = this.tab_views.width*/
+/*ll_height = this.tab_views.height*/
+this.tab_views.width = newwidth - 0 - 1239
+this.tab_views.height = newheight - 8 - 212
+newwidth = this.tab_views.width
+newheight = this.tab_views.height
+/*ll_x = this.tab_views.tabpage_console.x*/
+/*ll_y = this.tab_views.tabpage_console.y*/
+/*ll_width = this.tab_views.tabpage_console.width*/
+/*ll_height = this.tab_views.tabpage_console.height*/
+this.tab_views.tabpage_console.width = newwidth - 18 - 18
+this.tab_views.tabpage_console.height = newheight - 112 - 16
+newwidth = this.tab_views.tabpage_console.width
+newheight = this.tab_views.tabpage_console.height
+newwidth = this.tab_views.tabpage_console.width
+newheight = this.tab_views.tabpage_console.height
+newwidth = this.tab_views.tabpage_console.width
+newheight = this.tab_views.tabpage_console.height
+/*ll_x = this.tab_views.tabpage_console._cb_eval.x*/
+/*ll_y = this.tab_views.tabpage_console._cb_eval.y*/
+/*ll_width = this.tab_views.tabpage_console._cb_eval.width*/
+/*ll_height = this.tab_views.tabpage_console._cb_eval.height*/
+newwidth = this.tab_views.tabpage_console.width
+newheight = this.tab_views.tabpage_console.height
+newwidth = this.tab_views.tabpage_console.width
+newheight = this.tab_views.tabpage_console.height
+/*ll_x = this.tab_views.tabpage_console._cb_describe.x*/
+/*ll_y = this.tab_views.tabpage_console._cb_describe.y*/
+ll_width = this.tab_views.tabpage_console._cb_describe.width
+/*ll_height = this.tab_views.tabpage_console._cb_describe.height*/
+this.tab_views.tabpage_console._cb_describe.x= newwidth - 10 - ll_width
+newwidth = this.tab_views.tabpage_console.width
+newheight = this.tab_views.tabpage_console.height
+/*ll_x = this.tab_views.tabpage_console._cb_modify.x*/
+/*ll_y = this.tab_views.tabpage_console._cb_modify.y*/
+ll_width = this.tab_views.tabpage_console._cb_modify.width
+/*ll_height = this.tab_views.tabpage_console._cb_modify.height*/
+this.tab_views.tabpage_console._cb_modify.x= newwidth - 421 - ll_width
+newwidth = this.tab_views.tabpage_console.width
+newheight = this.tab_views.tabpage_console.height
+/*ll_x = this.tab_views.tabpage_console._uo_expression.x*/
+/*ll_y = this.tab_views.tabpage_console._uo_expression.y*/
+/*ll_width = this.tab_views.tabpage_console._uo_expression.width*/
+/*ll_height = this.tab_views.tabpage_console._uo_expression.height*/
+this.tab_views.tabpage_console._uo_expression.width = newwidth - 14 - 0
+newwidth = this.tab_views.tabpage_console.width
+newheight = this.tab_views.tabpage_console.height
+/*ll_x = this.tab_views.tabpage_console._sle_eval_row.x*/
+/*ll_y = this.tab_views.tabpage_console._sle_eval_row.y*/
+/*ll_width = this.tab_views.tabpage_console._sle_eval_row.width*/
+/*ll_height = this.tab_views.tabpage_console._sle_eval_row.height*/
+this.tab_views.tabpage_console._sle_eval_row.width = newwidth - 842 - 2171
+newwidth = this.tab_views.tabpage_console.width
+newheight = this.tab_views.tabpage_console.height
+/*ll_x = this.tab_views.tabpage_console._cb_getback.x*/
+/*ll_y = this.tab_views.tabpage_console._cb_getback.y*/
+/*ll_width = this.tab_views.tabpage_console._cb_getback.width*/
+/*ll_height = this.tab_views.tabpage_console._cb_getback.height*/
+newwidth = this.tab_views.tabpage_console.width
+newheight = this.tab_views.tabpage_console.height
+/*ll_x = this.tab_views.tabpage_console._st_hsplit1.x*/
+/*ll_y = this.tab_views.tabpage_console._st_hsplit1.y*/
+/*ll_width = this.tab_views.tabpage_console._st_hsplit1.width*/
+/*ll_height = this.tab_views.tabpage_console._st_hsplit1.height*/
+this.tab_views.tabpage_console._st_hsplit1.width = newwidth - 14 - 0
+newwidth = this.tab_views.tabpage_console.width
+newheight = this.tab_views.tabpage_console.height
+/*ll_x = this.tab_views.tabpage_console.cb_ddfunc.x*/
+/*ll_y = this.tab_views.tabpage_console.cb_ddfunc.y*/
+ll_width = this.tab_views.tabpage_console.cb_ddfunc.width
+/*ll_height = this.tab_views.tabpage_console.cb_ddfunc.height*/
+this.tab_views.tabpage_console.cb_ddfunc.x= newwidth - 5 - ll_width
+newwidth = this.tab_views.tabpage_console.width
+newheight = this.tab_views.tabpage_console.height
+/*ll_x = this.tab_views.tabpage_console.st_1.x*/
+/*ll_y = this.tab_views.tabpage_console.st_1.y*/
+ll_width = this.tab_views.tabpage_console.st_1.width
+/*ll_height = this.tab_views.tabpage_console.st_1.height*/
+this.tab_views.tabpage_console.st_1.x= newwidth - 119 - ll_width
+newwidth = this.tab_views.tabpage_console.width
+newheight = this.tab_views.tabpage_console.height
+/*ll_x = this.tab_views.tabpage_console._st_status.x*/
+/*ll_y = this.tab_views.tabpage_console._st_status.y*/
+/*ll_width = this.tab_views.tabpage_console._st_status.width*/
+/*ll_height = this.tab_views.tabpage_console._st_status.height*/
+newwidth = this.tab_views.tabpage_console.width
+newheight = this.tab_views.tabpage_console.height
+/*ll_x = this.tab_views.tabpage_console.tab_out.x*/
+/*ll_y = this.tab_views.tabpage_console.tab_out.y*/
+/*ll_width = this.tab_views.tabpage_console.tab_out.width*/
+/*ll_height = this.tab_views.tabpage_console.tab_out.height*/
+this.tab_views.tabpage_console.tab_out.width = newwidth - 9 - 0
+this.tab_views.tabpage_console.tab_out.height = newheight - 1464 - 12
+newwidth = this.tab_views.tabpage_console.tab_out.width
+newheight = this.tab_views.tabpage_console.tab_out.height
+/*ll_x = this.tab_views.tabpage_console.tab_out.tabpage_output.x*/
+/*ll_y = this.tab_views.tabpage_console.tab_out.tabpage_output.y*/
+/*ll_width = this.tab_views.tabpage_console.tab_out.tabpage_output.width*/
+/*ll_height = this.tab_views.tabpage_console.tab_out.tabpage_output.height*/
+this.tab_views.tabpage_console.tab_out.tabpage_output.width = newwidth - 19 - 18
+this.tab_views.tabpage_console.tab_out.tabpage_output.height = newheight - 16 - 112
+newwidth = this.tab_views.tabpage_console.tab_out.tabpage_output.width
+newheight = this.tab_views.tabpage_console.tab_out.tabpage_output.height
+/*ll_x = this.tab_views.tabpage_console.tab_out.tabpage_output._uo_msg.x*/
+/*ll_y = this.tab_views.tabpage_console.tab_out.tabpage_output._uo_msg.y*/
+/*ll_width = this.tab_views.tabpage_console.tab_out.tabpage_output._uo_msg.width*/
+/*ll_height = this.tab_views.tabpage_console.tab_out.tabpage_output._uo_msg.height*/
+this.tab_views.tabpage_console.tab_out.tabpage_output._uo_msg.width = newwidth - 0 - 0
+this.tab_views.tabpage_console.tab_out.tabpage_output._uo_msg.height = newheight - 0 - 0
+newwidth = this.tab_views.tabpage_console.tab_out.width
+newheight = this.tab_views.tabpage_console.tab_out.height
+/*ll_x = this.tab_views.tabpage_console.tab_out.tabpage_history.x*/
+/*ll_y = this.tab_views.tabpage_console.tab_out.tabpage_history.y*/
+/*ll_width = this.tab_views.tabpage_console.tab_out.tabpage_history.width*/
+/*ll_height = this.tab_views.tabpage_console.tab_out.tabpage_history.height*/
+this.tab_views.tabpage_console.tab_out.tabpage_history.width = newwidth - 19 - 18
+this.tab_views.tabpage_console.tab_out.tabpage_history.height = newheight - 16 - 112
+newwidth = this.tab_views.tabpage_console.tab_out.tabpage_history.width
+newheight = this.tab_views.tabpage_console.tab_out.tabpage_history.height
+/*ll_x = this.tab_views.tabpage_console.tab_out.tabpage_history._dw_histo.x*/
+/*ll_y = this.tab_views.tabpage_console.tab_out.tabpage_history._dw_histo.y*/
+/*ll_width = this.tab_views.tabpage_console.tab_out.tabpage_history._dw_histo.width*/
+/*ll_height = this.tab_views.tabpage_console.tab_out.tabpage_history._dw_histo.height*/
+this.tab_views.tabpage_console.tab_out.tabpage_history._dw_histo.width = newwidth - 4 - 0
+this.tab_views.tabpage_console.tab_out.tabpage_history._dw_histo.height = newheight - 0 - 4
+newwidth = this.tab_views.tabpage_console.width
+newheight = this.tab_views.tabpage_console.height
+/*ll_x = this.tab_views.tabpage_console._lb_functions.x*/
+/*ll_y = this.tab_views.tabpage_console._lb_functions.y*/
+ll_width = this.tab_views.tabpage_console._lb_functions.width
+/*ll_height = this.tab_views.tabpage_console._lb_functions.height*/
+this.tab_views.tabpage_console._lb_functions.x= newwidth - 10 - ll_width
+newwidth = this.tab_views.width
+newheight = this.tab_views.height
+/*ll_x = this.tab_views.tabpage_data.x*/
+/*ll_y = this.tab_views.tabpage_data.y*/
+/*ll_width = this.tab_views.tabpage_data.width*/
+/*ll_height = this.tab_views.tabpage_data.height*/
+this.tab_views.tabpage_data.width = newwidth - 18 - 18
+this.tab_views.tabpage_data.height = newheight - 112 - 16
+newwidth = this.tab_views.tabpage_data.width
+newheight = this.tab_views.tabpage_data.height
+/*ll_x = this.tab_views.tabpage_data.pb_autofilter.x*/
+/*ll_y = this.tab_views.tabpage_data.pb_autofilter.y*/
+ll_width = this.tab_views.tabpage_data.pb_autofilter.width
+/*ll_height = this.tab_views.tabpage_data.pb_autofilter.height*/
+this.tab_views.tabpage_data.pb_autofilter.x= newwidth - 932 - ll_width
+newwidth = this.tab_views.tabpage_data.width
+newheight = this.tab_views.tabpage_data.height
+/*ll_x = this.tab_views.tabpage_data.pb_setfullstate.x*/
+/*ll_y = this.tab_views.tabpage_data.pb_setfullstate.y*/
+ll_width = this.tab_views.tabpage_data.pb_setfullstate.width
+/*ll_height = this.tab_views.tabpage_data.pb_setfullstate.height*/
+this.tab_views.tabpage_data.pb_setfullstate.x= newwidth - 731 - ll_width
+newwidth = this.tab_views.tabpage_data.width
+newheight = this.tab_views.tabpage_data.height
+/*ll_x = this.tab_views.tabpage_data.pb_getfullstate.x*/
+/*ll_y = this.tab_views.tabpage_data.pb_getfullstate.y*/
+ll_width = this.tab_views.tabpage_data.pb_getfullstate.width
+/*ll_height = this.tab_views.tabpage_data.pb_getfullstate.height*/
+this.tab_views.tabpage_data.pb_getfullstate.x= newwidth - 836 - ll_width
+newwidth = this.tab_views.tabpage_data.width
+newheight = this.tab_views.tabpage_data.height
+/*ll_x = this.tab_views.tabpage_data._st_notice.x*/
+/*ll_y = this.tab_views.tabpage_data._st_notice.y*/
+/*ll_width = this.tab_views.tabpage_data._st_notice.width*/
+/*ll_height = this.tab_views.tabpage_data._st_notice.height*/
+this.tab_views.tabpage_data._st_notice.width = newwidth - 5 - 9
+newwidth = this.tab_views.tabpage_data.width
+newheight = this.tab_views.tabpage_data.height
+/*ll_x = this.tab_views.tabpage_data.pb_saveas.x*/
+/*ll_y = this.tab_views.tabpage_data.pb_saveas.y*/
+ll_width = this.tab_views.tabpage_data.pb_saveas.width
+/*ll_height = this.tab_views.tabpage_data.pb_saveas.height*/
+this.tab_views.tabpage_data.pb_saveas.x= newwidth - 626 - ll_width
+newwidth = this.tab_views.tabpage_data.width
+newheight = this.tab_views.tabpage_data.height
+/*ll_x = this.tab_views.tabpage_data.pb_showmodified.x*/
+/*ll_y = this.tab_views.tabpage_data.pb_showmodified.y*/
+ll_width = this.tab_views.tabpage_data.pb_showmodified.width
+/*ll_height = this.tab_views.tabpage_data.pb_showmodified.height*/
+this.tab_views.tabpage_data.pb_showmodified.x= newwidth - 114 - ll_width
+newwidth = this.tab_views.tabpage_data.width
+newheight = this.tab_views.tabpage_data.height
+/*ll_x = this.tab_views.tabpage_data.pb_update.x*/
+/*ll_y = this.tab_views.tabpage_data.pb_update.y*/
+ll_width = this.tab_views.tabpage_data.pb_update.width
+/*ll_height = this.tab_views.tabpage_data.pb_update.height*/
+this.tab_views.tabpage_data.pb_update.x= newwidth - 521 - ll_width
+newwidth = this.tab_views.tabpage_data.width
+newheight = this.tab_views.tabpage_data.height
+/*ll_x = this.tab_views.tabpage_data.pb_sortdata.x*/
+/*ll_y = this.tab_views.tabpage_data.pb_sortdata.y*/
+ll_width = this.tab_views.tabpage_data.pb_sortdata.width
+/*ll_height = this.tab_views.tabpage_data.pb_sortdata.height*/
+this.tab_views.tabpage_data.pb_sortdata.x= newwidth - 206 - ll_width
+newwidth = this.tab_views.tabpage_data.width
+newheight = this.tab_views.tabpage_data.height
+/*ll_x = this.tab_views.tabpage_data.pb_deleterow.x*/
+/*ll_y = this.tab_views.tabpage_data.pb_deleterow.y*/
+ll_width = this.tab_views.tabpage_data.pb_deleterow.width
+/*ll_height = this.tab_views.tabpage_data.pb_deleterow.height*/
+this.tab_views.tabpage_data.pb_deleterow.x= newwidth - 306 - ll_width
+newwidth = this.tab_views.tabpage_data.width
+newheight = this.tab_views.tabpage_data.height
+/*ll_x = this.tab_views.tabpage_data.pb_insertrow.x*/
+/*ll_y = this.tab_views.tabpage_data.pb_insertrow.y*/
+ll_width = this.tab_views.tabpage_data.pb_insertrow.width
+/*ll_height = this.tab_views.tabpage_data.pb_insertrow.height*/
+this.tab_views.tabpage_data.pb_insertrow.x= newwidth - 407 - ll_width
+newwidth = this.tab_views.tabpage_data.width
+newheight = this.tab_views.tabpage_data.height
+/*ll_x = this.tab_views.tabpage_data.pb_addcompute.x*/
+/*ll_y = this.tab_views.tabpage_data.pb_addcompute.y*/
+ll_width = this.tab_views.tabpage_data.pb_addcompute.width
+/*ll_height = this.tab_views.tabpage_data.pb_addcompute.height*/
+this.tab_views.tabpage_data.pb_addcompute.x= newwidth - 0 - ll_width
+newwidth = this.tab_views.tabpage_data.width
+newheight = this.tab_views.tabpage_data.height
+/*ll_x = this.tab_views.tabpage_data._dw_buffer.x*/
+/*ll_y = this.tab_views.tabpage_data._dw_buffer.y*/
+/*ll_width = this.tab_views.tabpage_data._dw_buffer.width*/
+/*ll_height = this.tab_views.tabpage_data._dw_buffer.height*/
+this.tab_views.tabpage_data._dw_buffer.width = newwidth - 4 - 5
+this.tab_views.tabpage_data._dw_buffer.height = newheight - 112 - 4
+newwidth = this.tab_views.tabpage_data.width
+newheight = this.tab_views.tabpage_data.height
+/*ll_x = this.tab_views.tabpage_data.tab_buffer.x*/
+/*ll_y = this.tab_views.tabpage_data.tab_buffer.y*/
+/*ll_width = this.tab_views.tabpage_data.tab_buffer.width*/
+/*ll_height = this.tab_views.tabpage_data.tab_buffer.height*/
+this.tab_views.tabpage_data.tab_buffer.width = newwidth - 0 - 0
+newwidth = this.tab_views.tabpage_data.tab_buffer.width
+newheight = this.tab_views.tabpage_data.tab_buffer.height
+newwidth = this.tab_views.tabpage_data.tab_buffer.width
+newheight = this.tab_views.tabpage_data.tab_buffer.height
+newwidth = this.tab_views.tabpage_data.tab_buffer.width
+newheight = this.tab_views.tabpage_data.tab_buffer.height
+newwidth = this.tab_views.tabpage_data.tab_buffer.width
+newheight = this.tab_views.tabpage_data.tab_buffer.height
+newwidth = this.tab_views.tabpage_data.width
+newheight = this.tab_views.tabpage_data.height
+/*ll_x = this.tab_views.tabpage_data.ddlb_datasource.x*/
+/*ll_y = this.tab_views.tabpage_data.ddlb_datasource.y*/
+ll_width = this.tab_views.tabpage_data.ddlb_datasource.width
+/*ll_height = this.tab_views.tabpage_data.ddlb_datasource.height*/
+this.tab_views.tabpage_data.ddlb_datasource.x= newwidth - 1102 - ll_width
+newwidth = this.tab_views.width
+newheight = this.tab_views.height
+/*ll_x = this.tab_views.tabpage_syntax.x*/
+/*ll_y = this.tab_views.tabpage_syntax.y*/
+/*ll_width = this.tab_views.tabpage_syntax.width*/
+/*ll_height = this.tab_views.tabpage_syntax.height*/
+this.tab_views.tabpage_syntax.width = newwidth - 18 - 18
+this.tab_views.tabpage_syntax.height = newheight - 112 - 16
+newwidth = this.tab_views.tabpage_syntax.width
+newheight = this.tab_views.tabpage_syntax.height
+/*ll_x = this.tab_views.tabpage_syntax.cbx_wrapmode.x*/
+/*ll_y = this.tab_views.tabpage_syntax.cbx_wrapmode.y*/
+ll_width = this.tab_views.tabpage_syntax.cbx_wrapmode.width
+ll_height = this.tab_views.tabpage_syntax.cbx_wrapmode.height
+this.tab_views.tabpage_syntax.cbx_wrapmode.y=newheight - 12 - ll_height
+this.tab_views.tabpage_syntax.cbx_wrapmode.x= newwidth - -91 - ll_width
+newwidth = this.tab_views.tabpage_syntax.width
+newheight = this.tab_views.tabpage_syntax.height
+/*ll_x = this.tab_views.tabpage_syntax._st_status_syntax.x*/
+/*ll_y = this.tab_views.tabpage_syntax._st_status_syntax.y*/
+/*ll_width = this.tab_views.tabpage_syntax._st_status_syntax.width*/
+ll_height = this.tab_views.tabpage_syntax._st_status_syntax.height
+this.tab_views.tabpage_syntax._st_status_syntax.y=newheight - 0 - ll_height
+this.tab_views.tabpage_syntax._st_status_syntax.width = newwidth - 252 - 105
+newwidth = this.tab_views.tabpage_syntax.width
+newheight = this.tab_views.tabpage_syntax.height
+/*ll_x = this.tab_views.tabpage_syntax._uo_syntax.x*/
+/*ll_y = this.tab_views.tabpage_syntax._uo_syntax.y*/
+/*ll_width = this.tab_views.tabpage_syntax._uo_syntax.width*/
+/*ll_height = this.tab_views.tabpage_syntax._uo_syntax.height*/
+this.tab_views.tabpage_syntax._uo_syntax.width = newwidth - 0 - 0
+this.tab_views.tabpage_syntax._uo_syntax.height = newheight - 0 - 92
+newwidth = this.tab_views.tabpage_syntax.width
+newheight = this.tab_views.tabpage_syntax.height
+/*ll_x = this.tab_views.tabpage_syntax.pb_sync.x*/
+/*ll_y = this.tab_views.tabpage_syntax.pb_sync.y*/
+/*ll_width = this.tab_views.tabpage_syntax.pb_sync.width*/
+ll_height = this.tab_views.tabpage_syntax.pb_sync.height
+this.tab_views.tabpage_syntax.pb_sync.y=newheight - -8 - ll_height
+newwidth = this.tab_views.width
+newheight = this.tab_views.height
+/*ll_x = this.tab_views.tabpage_help.x*/
+/*ll_y = this.tab_views.tabpage_help.y*/
+/*ll_width = this.tab_views.tabpage_help.width*/
+/*ll_height = this.tab_views.tabpage_help.height*/
+this.tab_views.tabpage_help.width = newwidth - 18 - 18
+this.tab_views.tabpage_help.height = newheight - 112 - 16
+newwidth = this.tab_views.tabpage_help.width
+newheight = this.tab_views.tabpage_help.height
+/*ll_x = this.tab_views.tabpage_help.rte_help.x*/
+/*ll_y = this.tab_views.tabpage_help.rte_help.y*/
+/*ll_width = this.tab_views.tabpage_help.rte_help.width*/
+/*ll_height = this.tab_views.tabpage_help.rte_help.height*/
+this.tab_views.tabpage_help.rte_help.width = newwidth - 5 - 0
+this.tab_views.tabpage_help.rte_help.height = newheight - 0 - 0
+newwidth = this.width
+newheight = this.height
+/*ll_x = this.cbx_showdef.x*/
+/*ll_y = this.cbx_showdef.y*/
+/*ll_width = this.cbx_showdef.width*/
+ll_height = this.cbx_showdef.height
+this.cbx_showdef.y=newheight - 116 - ll_height
+newwidth = this.width
+newheight = this.height
+/*ll_x = this.st_dataobject.x*/
+/*ll_y = this.st_dataobject.y*/
+/*ll_width = this.st_dataobject.width*/
+ll_height = this.st_dataobject.height
+this.st_dataobject.y=newheight - 16 - ll_height
+this.st_dataobject.width = newwidth - 4 - 5
+newwidth = this.width
+newheight = this.height
+/*ll_x = this.pb_break.x*/
+/*ll_y = this.pb_break.y*/
+/*ll_width = this.pb_break.width*/
+ll_height = this.pb_break.height
+this.pb_break.y=newheight - 100 - ll_height
+newwidth = this.width
+newheight = this.height
+/*ll_x = this.pb_sort.x*/
+/*ll_y = this.pb_sort.y*/
+/*ll_width = this.pb_sort.width*/
+ll_height = this.pb_sort.height
+this.pb_sort.y=newheight - 100 - ll_height
+newwidth = this.width
+newheight = this.height
+/*ll_x = this.pb_filter.x*/
+/*ll_y = this.pb_filter.y*/
+/*ll_width = this.pb_filter.width*/
+ll_height = this.pb_filter.height
+this.pb_filter.y=newheight - 100 - ll_height
+newwidth = this.width
+newheight = this.height
+/*ll_x = this.pb_visible.x*/
+/*ll_y = this.pb_visible.y*/
+/*ll_width = this.pb_visible.width*/
+/*ll_height = this.pb_visible.height*/
+newwidth = this.width
+newheight = this.height
+/*ll_x = this.pb_compute.x*/
+/*ll_y = this.pb_compute.y*/
+/*ll_width = this.pb_compute.width*/
+/*ll_height = this.pb_compute.height*/
+newwidth = this.width
+newheight = this.height
+/*ll_x = this.pb_column.x*/
+/*ll_y = this.pb_column.y*/
+/*ll_width = this.pb_column.width*/
+/*ll_height = this.pb_column.height*/
+newwidth = this.width
+newheight = this.height
+/*ll_x = this.tv_controls.x*/
+/*ll_y = this.tv_controls.y*/
+/*ll_width = this.tv_controls.width*/
+/*ll_height = this.tv_controls.height*/
+this.tv_controls.height = newheight - 164 - 208
+newwidth = this.width
+newheight = this.height
+/*ll_x = this.cb_close.x*/
+/*ll_y = this.cb_close.y*/
+ll_width = this.cb_close.width
+ll_height = this.cb_close.height
+this.cb_close.y=newheight - 116 - ll_height
+this.cb_close.x= newwidth - 5 - ll_width
+newwidth = this.width
+newheight = this.height
+/*ll_x = this.pb_text.x*/
+/*ll_y = this.pb_text.y*/
+/*ll_width = this.pb_text.width*/
+/*ll_height = this.pb_text.height*/
+newwidth = this.width
+newheight = this.height
+/*ll_x = u_genidwdm_cst_band.x*/
+/*ll_y = u_genidwdm_cst_band.y*/
+/*ll_width = u_genidwdm_cst_band.width*/
+/*ll_height = u_genidwdm_cst_band.height
+u_genidwdm_cst_band.y=newheight - 96 - ll_height
+u_genidwdm_cst_band.width = newwidth - 411 - 837
+newwidth = u_genidwdm_cst_band.width
+newheight = u_genidwdm_cst_band.height
+newwidth = u_genidwdm_cst_band.width
+newheight = u_genidwdm_cst_band.height*/
+this.setredraw( true )
 end event
 
 event key;call super::key;if keyDown(KeyA!) and Keydown(KeyControl!) then
@@ -2357,8 +2779,8 @@ type pb_sortdata from picturebutton within tabpage_data
 string tag = "TR;"
 integer x = 2907
 integer y = 4
-integer width = 101
-integer height = 88
+integer width = 110
+integer height = 96
 integer taborder = 100
 integer textsize = -10
 integer weight = 400
@@ -2383,8 +2805,8 @@ type pb_deleterow from picturebutton within tabpage_data
 string tag = "TR;"
 integer x = 2807
 integer y = 4
-integer width = 101
-integer height = 88
+integer width = 110
+integer height = 96
 integer taborder = 90
 integer textsize = -10
 integer weight = 400
@@ -2410,8 +2832,8 @@ type pb_insertrow from picturebutton within tabpage_data
 string tag = "TR;"
 integer x = 2706
 integer y = 4
-integer width = 101
-integer height = 88
+integer width = 110
+integer height = 96
 integer taborder = 80
 integer textsize = -10
 integer weight = 400
@@ -2482,6 +2904,9 @@ end event
 event resize;if isValid( uo_powerfilter ) and not isnull( uo_powerfilter ) then
 	uo_powerfilter.TriggerEvent("ue_positionbuttons")
 end if
+end event
+
+event itemerror;return 2
 end event
 
 type tab_buffer from tab within tabpage_data
@@ -2702,8 +3127,8 @@ end event
 type pb_sync from picturebutton within tabpage_syntax
 string tag = "BL;"
 integer y = 2012
-integer width = 101
-integer height = 88
+integer width = 110
+integer height = 96
 integer taborder = 80
 boolean bringtotop = true
 integer textsize = -10
@@ -2721,8 +3146,8 @@ end type
 
 event clicked;string ls_error = ""
 /*
-	TODO: il faudrait mémoriser les lignes et leurs états pour tout les buffers !
-	=> maintenant, cela n'est possible que si la definition des colonnes n'a pas changé (nombre, ordre et datatype)
+	TODO: il faudrait m$$HEX1$$e900$$ENDHEX$$moriser les lignes et leurs $$HEX1$$e900$$ENDHEX$$tats pour tout les buffers !
+	=> maintenant, cela n'est possible que si la definition des colonnes n'a pas chang$$HEX2$$e9002000$$ENDHEX$$(nombre, ordre et datatype)
 */
 idw_obj.Create( uo_syntax.of_GetText(), ls_error )
 if ls_error <> "" then
@@ -2849,8 +3274,8 @@ string tag = "BL;"
 boolean visible = false
 integer x = 242
 integer y = 2252
-integer width = 101
-integer height = 88
+integer width = 110
+integer height = 96
 integer taborder = 70
 integer textsize = -8
 integer weight = 400
@@ -2874,8 +3299,8 @@ type pb_sort from picturebutton within w_genidwdm_dwdebugger
 string tag = "BL;"
 integer x = 123
 integer y = 2252
-integer width = 101
-integer height = 88
+integer width = 110
+integer height = 96
 integer taborder = 70
 integer textsize = -8
 integer weight = 400
@@ -2902,8 +3327,8 @@ type pb_filter from picturebutton within w_genidwdm_dwdebugger
 string tag = "BL;"
 integer x = 5
 integer y = 2252
-integer width = 101
-integer height = 88
+integer width = 110
+integer height = 96
 integer taborder = 70
 integer textsize = -8
 integer weight = 400

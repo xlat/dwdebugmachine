@@ -1,4 +1,4 @@
-﻿$PBExportHeader$nv_genidwdm_data_adapter.sru
+HA$PBExportHeader$nv_genidwdm_data_adapter.sru
 forward
 global type nv_genidwdm_data_adapter from nonvisualobject
 end type

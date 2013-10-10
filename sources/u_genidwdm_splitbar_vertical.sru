@@ -1,4 +1,4 @@
-﻿$PBExportHeader$u_genidwdm_splitbar_vertical.sru
+HA$PBExportHeader$u_genidwdm_splitbar_vertical.sru
 $PBExportComments$Vertical Splitbar Object
 forward
 global type u_genidwdm_splitbar_vertical from statictext
@@ -38,7 +38,7 @@ PowerObject ipo_parent
 Dragobject idrg_left[]
 Dragobject idrg_right[]
 
-powerobject ipo_resizer
+nv_genidwdm_auto_resizer ipo_resizer
 
 long il_offsets_left[]
 boolean ib_keep_dim_left[]
@@ -60,7 +60,6 @@ Integer ii_maxrange = 100
 
 long il_prev_pos	//avoid flickering
 end variables
-
 forward prototypes
 public function unsignedlong of_get_syscolor (integer ai_index)
 public subroutine of_set_livesizing (boolean ab_flag)
@@ -256,7 +255,7 @@ FOR li_cnt = 1 TO li_max
 		if ib_keep_offsets then idrg_left[li_cnt].width -= il_offsets_left[li_cnt]
 	end if
 	if isvalid( ipo_resizer ) then
-		lnv_resizer = ipo_resizer.dynamic of_findobject( idrg_left[li_cnt] )
+		lnv_resizer = ipo_resizer.of_findobject( idrg_left[li_cnt] )
 		if isvalid( lnv_resizer ) then
 			lnv_resizer.of_x_changed( idrg_left[li_cnt].x, idrg_left[li_cnt].width, true )
 		end if
@@ -283,15 +282,13 @@ FOR li_cnt = 1 TO li_max
 		end if
 	end if
 	if isvalid( ipo_resizer ) then
-		lnv_resizer = ipo_resizer.dynamic of_findobject( idrg_right[li_cnt] )
+		lnv_resizer = ipo_resizer.of_findobject( idrg_right[li_cnt] )
 		if isvalid( lnv_resizer ) then
 			lnv_resizer.of_x_changed( idrg_right[li_cnt].x, idrg_right[li_cnt].width, false )
 		end if
 	end if	
 NEXT
-
 iw_parent.SetRedraw(True)
-
 end subroutine
 
 public subroutine of_set_minsize (integer ai_minrange, integer ai_maxrange);// set minimum size

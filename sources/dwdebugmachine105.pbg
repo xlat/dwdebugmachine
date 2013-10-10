@@ -1,0 +1,12 @@
+Save Format v3.0(19990112)
+@begin Libraries
+ "dwdebugmachine105.pbl" "";
+@end;
+@begin Objects
+ "w_main.srw" "dwdebugmachine105.pbl";
+ "u_genidwdm_cst_band.sru" "dwdebugmachine105.pbl";
+ "dwdebugmachine105.sra" "dwdebugmachine105.pbl";
+ "dddw_test.srd" "dwdebugmachine105.pbl";
+ "dw_template_1.srd" "dwdebugmachine105.pbl";
+ "make_dist.srj" "dwdebugmachine105.pbl";
+@end;

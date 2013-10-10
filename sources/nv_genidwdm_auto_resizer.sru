@@ -1,4 +1,4 @@
-﻿$PBExportHeader$nv_genidwdm_auto_resizer.sru
+HA$PBExportHeader$nv_genidwdm_auto_resizer.sru
 $PBExportComments$Resize handler that can move / resize objects in a container during resizing - Author GeNi
 forward
 global type nv_genidwdm_auto_resizer from nonvisualobject
@@ -74,17 +74,23 @@ public function string gettag (powerobject apo_obj)
 public function string of_get_control_behavior (powerobject apo_obj)
 public function boolean of_forget_control (powerobject apo_obj)
 public function boolean hasmethod (string as_method, powerobject apo_object)
+public function string of_generate_code (string as_output, powerobject apo_thisobj)
+public function string getabsoluteobjectname (powerobject apo_obj, powerobject apo_root)
 end prototypes
 
 event type long resize(unsignedlong sizetype, integer newwidth, integer newheight);if newwidth = 0 and newheight = 0 then return 0
 //debug_message( classname(), ipo_object.classname() + " Resize : " + string( newwidth ) + " x " + string( newheight ) + " - " + string( sizetype ) )
 //Now we can do the main Engine here !
-long ll_x, ll_y, ll_width, ll_height
-long ll_parent_x, ll_parent_y, ll_parent_width, ll_parent_height
-ll_x = of_get_x( ipo_object )
-ll_y = of_get_y( ipo_object )
-ll_width = of_get_width( ipo_object )
-ll_height = of_get_height( ipo_object )
+long /*ll_x, ll_y,*/ ll_width, ll_height
+long /*ll_parent_x, ll_parent_y,*/ ll_parent_width, ll_parent_height
+//ll_x = of_get_x( ipo_object )
+//ll_y = of_get_y( ipo_object )
+if ( ib_anchor_right and not ib_anchor_left and not ib_center_h) or ib_center_h then
+	ll_width = of_get_width( ipo_object )
+end if
+if ((ib_anchor_bottom or ib_center_v) and not ib_anchor_top and not ib_center_v) or ib_center_v then
+	ll_height = of_get_height( ipo_object )
+end if
 
 if (ib_anchor_bottom or ib_center_v) and not ib_anchor_top and not ib_center_v then 
 	of_set_y( ipo_object, newheight - il_anchored_bottom - ll_height )
@@ -103,23 +109,24 @@ if ib_anchor_top and ib_anchor_bottom  then
 end if
 
 if ib_center_v and isvalid(inv_parent_resizer) then
-	ll_parent_y = of_get_y(inv_parent_resizer.ipo_object)
+//	ll_parent_y = of_get_y(inv_parent_resizer.ipo_object)
 	ll_parent_height = of_get_height(inv_parent_resizer.ipo_object)
 	of_set_y( ipo_object, (ll_parent_height - ll_height)/2 )
 end if
 
 if ib_center_h and isvalid(inv_parent_resizer) then
-	ll_parent_x = of_get_x(inv_parent_resizer.ipo_object)
+//	ll_parent_x = of_get_x(inv_parent_resizer.ipo_object)
 	ll_parent_width = of_get_width(inv_parent_resizer.ipo_object)
 	of_set_x( ipo_object, (ll_parent_width - ll_width)/2 )
 end if
 
-
 //Here we ask to all of our child to be resized as we are !
 long i
+ll_width = of_get_width( ipo_object )
+ll_height = of_get_height( ipo_object )
 for i = 1 to upperbound( ir_registered_controls[] )
 	if isvalid(ir_registered_controls[i]) then
-		ir_registered_controls[i].event resize( sizetype, of_get_width( ipo_object ), of_get_height( ipo_object ) )
+		ir_registered_controls[i].event resize( sizetype, ll_width, ll_height )
 	end if
 next
 return 0
@@ -337,7 +344,6 @@ else
 		end if
 	end if
 end if
-
 end subroutine
 
 public subroutine of_y_changed (long al_newy, long al_newheight, boolean ab_totop);if not (ib_anchor_top or ib_anchor_bottom) then return
@@ -533,16 +539,18 @@ nv_genidwdm_auto_resizer lnv_res
 //debug_message(classname(),ipo_object.classname() + ".findobjectcontroller(" + apo_obj.classname() +")", debug_level_parano)
 
 if ipo_object = apo_obj then
-//	debug_message(classname()," --> trouvé dans " + ipo_object.classname(), debug_level_parano)	
+//	debug_message(classname()," --> trouve dans " + ipo_object.classname(), debug_level_parano)	
 	lnv_res = this
 else
 	for i = 1 to upperbound(ir_registered_controls[])
-		lnv_res = ir_registered_controls[i].findobjectcontroller(apo_obj)
-		if isvalid(lnv_res) then exit
+		if isvalid(ir_registered_controls[i]) and not isnull(ir_registered_controls[i]) then
+			lnv_res = ir_registered_controls[i].findobjectcontroller(apo_obj)
+			if isvalid(lnv_res) then exit
+		end if
 	next
 end if
 
-return lnv_res // attention : peut être invalide si objet non trouvé, utiliser isvalid()
+return lnv_res // attention : peut etre invalide si objet non trouve, utiliser isvalid()
 
 end function
 
@@ -606,6 +614,7 @@ if ipo_object = apo_obj then
 	return true
 else
 	for i = 1 to upperbound(ir_registered_controls[])
+		if isnull(ir_registered_controls[i]) or not isvalid(ir_registered_controls[i]) then continue
 		lb_forgetted = ir_registered_controls[i].of_forget_control(apo_obj)
 		if lb_forgetted then 
 			setnull(ir_registered_controls[i])
@@ -636,6 +645,153 @@ next
 
 return false
 
+end function
+
+public function string of_generate_code (string as_output, powerobject apo_thisobj);//	SYNOPSIS
+//
+//		//Typically called at the end of an open event:
+//		inv_resize.of_generate_code( "", this )
+//		//or
+//		inv_resize.of_generate_code( classname()+"_event_resize.txt", true )
+//
+//	DESCRIPTION
+//
+//		Generate source code for static resizer behaviour, code to be put on the resize event : 
+//
+//			resize( /*unsignedlong sizetype*/, /*integer newwidth*/, /*integer newheight */) long
+//
+// ARGUMENTS
+//
+//	as_output (string)
+//		if passed an empty string, it will write the code to the clipboard,
+//		otherwhise write generated code into the given filename.
+//
+//	apo_this (powerobject) 
+//		the root object for resize event.
+string ls_code
+if as_output <> '*' then
+	ls_code   = "/* Auto generated code from "+classname()+" */~r~n"
+	ls_code += "/* - does NOT handle dynamic created object */~r~n"
+	ls_code += "/* - does NOT handle H/V splitters */~r~n"
+	ls_code += "this.setredraw( false )~r~n"	
+	ls_code +="//inv_resizer.event resize( sizetype, width, height )~r~n"
+	ls_code +="if newwidth = 0 and newheight = 0 then return 0~r~n"
+	ls_code +="long /*ll_x, ll_y,*/ ll_width, ll_height~r~n"
+	ls_code +="long ll_parent_x, ll_parent_y, ll_parent_width, ll_parent_height~r~n"
+end if
+string ls_objname, ls_parentname
+long i
+nv_genidwdm_auto_resizer obj
+obj = this
+ls_objname = getAbsoluteObjectName(obj.ipo_object, apo_thisobj )
+if  obj.ib_anchor_left or obj.ib_anchor_right or obj.ib_anchor_top or obj.ib_anchor_bottom or obj.ib_center_h or obj.ib_center_v then
+	ls_code += "/*ll_x = "+ls_objname+".x*/~r~n"
+	ls_code += "/*ll_y = "+ls_objname+".y*/~r~n"
+	if obj.TypeOf() = window! then
+		if ( obj.ib_anchor_right and not obj.ib_anchor_left ) or obj.ib_center_h then
+			ls_code += "ll_width = getclientwidth("+ls_objname+")~r~n"
+		else
+			ls_code += "/*ll_width = getclientwidth("+ls_objname+")*/~r~n"
+		end if
+		if ( (obj.ib_anchor_bottom or obj.ib_center_v) and not obj.ib_anchor_top ) or obj.ib_center_v then
+			ls_code += "ll_height = getclientheight("+ls_objname+")~r~n"	
+		else
+			ls_code += "/*ll_height = getclientheight("+ls_objname+")*/~r~n"	
+		end if
+	else
+		if ( obj.ib_anchor_right and not obj.ib_anchor_left ) or obj.ib_center_h then
+			ls_code += "ll_width = "+ls_objname+".width~r~n"
+		else
+			ls_code += "/*ll_width = "+ls_objname+".width*/~r~n"
+		end if
+		if ( (obj.ib_anchor_bottom or obj.ib_center_v) and not obj.ib_anchor_top ) or obj.ib_center_v then
+			ls_code += "ll_height = "+ls_objname+".height~r~n"	
+		else
+			ls_code += "/*ll_height = "+ls_objname+".height*/~r~n"
+		end if
+	end if
+	if (obj.ib_anchor_bottom or obj.ib_center_v) and not obj.ib_anchor_top and not obj.ib_center_v then 
+		ls_code += ls_objname + ".y=newheight - "+string(obj.il_anchored_bottom)+" - ll_height~r~n"
+	end if
+	if obj.ib_anchor_right and not obj.ib_anchor_left and not obj.ib_center_h then
+		ls_code += ls_objname + ".x= newwidth - "+string(obj.il_anchored_right)+" - ll_width~r~n"
+	end if
+	if obj.ib_anchor_left and obj.ib_anchor_right then
+		ls_code += ls_objname + ".width = newwidth - "+string(obj.il_anchored_right)+" - "+string(il_anchored_left)+"~r~n"
+	end if	
+	if obj.ib_anchor_top and obj.ib_anchor_bottom  then
+		ls_code += ls_objname + ".height = newheight - "+string(obj.il_anchored_top)+" - "+string(il_anchored_bottom)+"~r~n"
+	end if
+	
+	if isvalid(obj.inv_parent_resizer) then
+		ls_parentname = getabsoluteobjectname( obj.inv_parent_resizer.ipo_object, apo_thisobj )
+		if obj.ib_center_v then
+			ls_code += "/*ll_parent_y = "+ls_parentname+".y*/~r~n"
+			ls_code += "ll_parent_height = "+ls_parentname+".height~r~n"
+			ls_code += ls_objname + ".y = (ll_parent_height - ll_height)/2~r~n"
+		end if
+		
+		if obj.ib_center_h then
+			ls_code += "/*ll_parent_x = "+ls_parentname+".x*/~r~n"
+			ls_code += "ll_parent_width = "+ls_parentname+".width~r~n"
+			ls_code += ls_objname+".x = (ll_parent_width - ll_width)/2~r~n"
+		end if
+	end if
+end if
+
+for i = 1 to upperbound( ir_registered_controls[] )
+	if isvalid(ir_registered_controls[i]) then
+		//ir_registered_controls[i].event resize( sizetype, of_get_width( ipo_object ), of_get_height( ipo_object ) )
+		//recursive scan objects
+		ls_code += "newwidth = "+ls_objname+".width~r~n"
+		ls_code += "newheight = "+ls_objname+".height~r~n"
+		ls_code += ir_registered_controls[i].of_generate_code( "*", apo_thisobj )
+	end if
+next
+
+if as_output <> '*' then ls_code += "this.setredraw( true )"
+
+if as_output='' then
+	clipboard( ls_code )
+elseif as_output <> '*' then
+	int li_handle
+	li_handle = FileOpen( as_output, linemode!, write!, lockwrite!, replace! )
+	if li_handle > 0 then
+		FileWriteEx( li_handle, ls_code )
+		FileClose( li_handle )
+	end if
+end if
+return ls_code
+end function
+
+public function string getabsoluteobjectname (powerobject apo_obj, powerobject apo_root);//return the Absolute object name ( contain hierarchical parent's name )
+PowerObject	lpo_parent
+String ls_object
+
+// loop thru parents building object name
+if isnull(apo_obj) or not isvalid(apo_obj) then
+	DebugBreak()
+	return "(null or invalid object)"
+end if
+
+if apo_obj = apo_root then
+	ls_object = 'this'
+else
+	ls_object = apo_obj.ClassName()
+end if
+lpo_parent = apo_obj.GetParent()
+
+Do While IsValid (lpo_parent) and Not IsNull( lpo_parent )
+	if lpo_parent = apo_root then
+		ls_object = 'this.'+ls_object
+	else
+		ls_object = lpo_parent.ClassName() + "." + ls_object
+	end if
+	if lpo_parent.TypeOf() = Window! then exit	//stop condition
+	lpo_parent = lpo_parent.GetParent()
+Loop
+
+Return ls_object
 end function
 
 on nv_genidwdm_auto_resizer.create

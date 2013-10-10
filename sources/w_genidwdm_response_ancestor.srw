@@ -1,4 +1,4 @@
-﻿$PBExportHeader$w_genidwdm_response_ancestor.srw
+HA$PBExportHeader$w_genidwdm_response_ancestor.srw
 $PBExportComments$Response ancestor (author=MK)(state=GAMMA)
 forward
 global type w_genidwdm_response_ancestor from window
@@ -246,7 +246,7 @@ end if
 if ib_always_on_top then
 	alwaysontop( true )
 end if
-//hack ? la fenetre ne se dessine pas correctement sans ça...
+//hack ? la fenetre ne se dessine pas correctement sans $$HEX1$$e700$$ENDHEX$$a...
 setredraw( false )
 setredraw( true )
 

@@ -1,4 +1,4 @@
-﻿$PBExportHeader$u_genidwdm_scilexer.sru
+HA$PBExportHeader$u_genidwdm_scilexer.sru
 $PBExportComments$Wrapper for the Scintilla editor component
 forward
 global type u_genidwdm_scilexer from userobject

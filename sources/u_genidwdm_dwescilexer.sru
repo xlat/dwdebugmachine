@@ -1,4 +1,4 @@
-﻿$PBExportHeader$u_genidwdm_dwescilexer.sru
+HA$PBExportHeader$u_genidwdm_dwescilexer.sru
 $PBExportComments$Wrapper for the Scintilla editor component - DWExpression specifics
 forward
 global type u_genidwdm_dwescilexer from u_genidwdm_scilexer
@@ -205,7 +205,7 @@ as_function_flat_list = ls_func_list
 end subroutine
 
 public subroutine of_init (nv_genidwdm_data_adapter adw_obj);//uo_expression.of_setlanguage( "dwexpr" ) // <=== enlever ceci quand ce qui suit fonctionnera
-//ICI, ajout de mot clés reconnus...
+//ICI, ajout de mot cl$$HEX1$$e900$$ENDHEX$$s reconnus...
 //On pourra ajouter les Controls/Bands en tant que TABLES et les attributs en tant que COLUMNS
 string ls_object_list, ls_dwattributes
 string ls_functions[]
@@ -258,7 +258,7 @@ this.of_Sendeditor( this.SCI_AUTOCGETAUTOHIDE, 0 )	//keep list open (just for de
 
 this.of_Sendeditor( this.SCI_AUTOCSETFILLUPS, 0, ls_fillup )
 
-//récupération des chars avant le curseur qui correspondent au début d'un mot.
+//r$$HEX1$$e900$$ENDHEX$$cup$$HEX1$$e900$$ENDHEX$$ration des chars avant le curseur qui correspondent au d$$HEX1$$e900$$ENDHEX$$but d'un mot.
 string ls_word, ls_prefix = "", ls_line
 long ll_line
 ll_line =  this.of_getcurrentline( )
@@ -282,7 +282,7 @@ if lrx_lastword.search( ls_word ) > 0 then
 	end if
 end if
 destroy lrx_lastword
-//récupére la liste de completion correspondante.
+//r$$HEX1$$e900$$ENDHEX$$cup$$HEX1$$e900$$ENDHEX$$re la liste de completion correspondante.
 string ls_wordlist
 long i
 boolean lb_trailling_dot = false
@@ -367,9 +367,9 @@ this.of_Sendeditor( this.SCI_AUTOCSETIGNORECASE, 1 )	//ignore case
 this.of_Sendeditor( this.SCI_AUTOCGETAUTOHIDE, 1 )	//keep list open (just for debugging)
 this.of_Sendeditor( this.SCI_AUTOCSETFILLUPS, 0, ls_fillup )		//chars ending completion
 //			this.of_Sendeditor( this.SCI_AUTOCSETSEPARATOR, asc('|') )		
-//récupération des chars avant le curseur qui correspondent au début d'un mot.
+//r$$HEX1$$e900$$ENDHEX$$cup$$HEX1$$e900$$ENDHEX$$ration des chars avant le curseur qui correspondent au d$$HEX1$$e900$$ENDHEX$$but d'un mot.
 string ls_word, ls_line
-long ll_line	//lecture de la ligne en cours d'édition
+long ll_line	//lecture de la ligne en cours d'$$HEX1$$e900$$ENDHEX$$dition
 ll_line =  this.of_getcurrentline()
 ls_line = fill( " ", this.of_sendeditor( this.sci_linelength, ll_line -1)  )
 this.of_sendeditor( this.sci_getline, ll_line -1, ls_line )
@@ -453,7 +453,7 @@ destroy lrx_lastword
 //				ls_wordori = ls_word
 //			end if
 //debug_message( "autocompletiong", "word=" + ls_word + ", wordori = " + ls_wordori, debug_level_high )
-//récupére la liste de completion correspondante.
+//r$$HEX1$$e900$$ENDHEX$$cup$$HEX1$$e900$$ENDHEX$$re la liste de completion correspondante.
 string ls_document
 ls_document = this.of_gettext( )
 string ls_wordlist
@@ -561,7 +561,7 @@ ll_res = this.of_sendeditor( SCI_LOADLEXERLIBRARY, 0, ls_libname )
 string ls_lexer = "dwexpr"
 this.of_sendeditor( this.SCI_SETLEXERLANGUAGE, 0, ls_lexer )
 if ll_lexer = this.of_sendeditor( this.sci_getlexer ) then
-//	MessageBox("", "Chargement foiré" )
+//	MessageBox("", "Chargement foir$$HEX1$$e900$$ENDHEX$$" )
 end if
 
 // here we customize the styles

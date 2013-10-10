@@ -1,4 +1,4 @@
-﻿$PBExportHeader$m_genidwdm_contextmenu.srm
+HA$PBExportHeader$m_genidwdm_contextmenu.srm
 forward
 global type m_genidwdm_contextmenu from menu
 end type
