@@ -1241,7 +1241,7 @@ end if
 
 super::event open()
 //Generate Code for resizer.
-if ib_resize_handler then inv_resizer.of_generate_code( "", this )
+//if ib_resize_handler then inv_resizer.of_generate_code( "", this )
 
 //LazyRefactoring
 dw_buffer = tab_views.tabpage_data._dw_buffer

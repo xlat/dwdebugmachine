@@ -172,8 +172,12 @@ return 0
 
 end function
 
-public function long of_get_x (powerobject apo_obj);return CWGetField( apo_obj, "x")
-
+public function long of_get_x (powerobject apo_obj);
+if apo_obj.TypeOf() = line! then
+	return CWGetField( apo_obj, "BeginX")
+else
+	return CWGetField( apo_obj, "x")
+end if
 end function
 
 public function string of_datatypeof (powerobject apo_object);classdefinition lcd_classdef
@@ -201,14 +205,20 @@ return lcd_classdef.isvisualtype
 
 end function
 
-public function long of_get_y (powerobject apo_obj);return CWGetField( apo_obj, "y")
-
+public function long of_get_y (powerobject apo_obj);
+if apo_obj.TypeOf() = line! then
+	return CWGetField( apo_obj, "BeginY")
+else
+	return CWGetField( apo_obj, "y")
+end if
 end function
 
 public function long of_get_width (powerobject apo_obj);//return the width of the current object
 
 if apo_obj.TypeOf() = window! then
 	return getclientwidth(apo_obj)
+elseif apo_obj.TypeOf() = line! then
+	return long(CWGetField( apo_obj, "EndX")) - long(CWGetField( apo_obj, "BeginX"))
 else
 	return CWGetField( apo_obj, "width")
 end if
@@ -218,10 +228,11 @@ end function
 public function long of_get_height (powerobject apo_obj);//return the height of the current object
 if apo_obj.TypeOf() = window! then
 	return getclientheight(apo_obj)
+elseif apo_obj.TypeOf() = line! then
+	return long(CWGetField( apo_obj, "EndY")) - long(CWGetField( apo_obj, "BeginY"))
 else
 	return CWGetField( apo_obj, "height" )
 end if
-
 end function
 
 public subroutine of_set_tag (powerobject apo_obj, string as_newtag);CWSetField( apo_obj, "tag", as_newtag)
@@ -251,8 +262,12 @@ end choose
 
 end subroutine
 
-public subroutine of_set_y (powerobject apo_obj, long al_y);CWSetField( apo_obj, "y", al_y)
-
+public subroutine of_set_y (powerobject apo_obj, long al_y);
+if apo_obj.TypeOf() = line! then
+	CWSetField( apo_obj, "BeginY", al_y)
+else
+	CWSetField( apo_obj, "y", al_y)
+end if
 end subroutine
 
 public function integer initialize (powerobject apo_obj, powerobject apo_parent);
@@ -273,20 +288,33 @@ return upperbound( ir_registered_controls[] )
 
 end function
 
-public subroutine of_set_x (powerobject apo_obj, long al_x);CWSetField( apo_obj, "x", al_x)
+public subroutine of_set_x (powerobject apo_obj, long al_x);
+if apo_obj.TypeOf() = line! then
+	CWSetField( apo_obj, "BeginX", al_x)
+else
+	CWSetField( apo_obj, "x", al_x)
+end if
 
 end subroutine
 
-public subroutine of_set_width (powerobject apo_obj, long al_w);CWSetField( apo_obj, "width", al_w)
+public subroutine of_set_width (powerobject apo_obj, long al_w);
+if apo_obj.TypeOf() = line! then
+	CWSetField( apo_obj, "EndX", al_w + long(CWGetField( apo_obj, "BeginX")))
+else
+	CWSetField( apo_obj, "width", al_w)
+end if
 
 // /!\ for windows, the width is not what you think ;)
-
 end subroutine
 
-public subroutine of_set_height (powerobject apo_obj, long al_h);CWSetField( apo_obj, "height", al_h)
+public subroutine of_set_height (powerobject apo_obj, long al_h);
+if apo_obj.TypeOf() = line! then
+	CWSetField( apo_obj, "EndY", al_h + long(CWGetField( apo_obj, "BeginY")))
+else
+	CWSetField( apo_obj, "height", al_h)
+end if
 
 // /!\ for windows, the height is not what you think ;)
-
 end subroutine
 
 public function string of_datatypeofcontainer (powerobject apo_object);classdefinition lcd_classdef
