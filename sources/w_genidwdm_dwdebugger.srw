@@ -684,16 +684,40 @@ long i, ll_cols, ll_colsize
 long ll_h_x = 0, ll_h_y = 8, ll_x = 0, ll_y = 8, ll_width = 0, ll_h_height = 52, ll_height = 64
 long ll_max_width = 500
 string ls_cols_def, ls_cols_header, ls_cols_field
-string ls_col_id, ls_col_name, ls_col_dbname, ls_col_type, ls_col_pk, ls_col_align, ls_tmp
+string ls_col_id, ls_col_name, ls_type, ls_col_dbname, ls_col_type, ls_col_pk, ls_col_align, ls_tmp
+string ls_syntax, ls_error
 ll_cols = long ( idw_obj.describe("datawindow.column.count") )
 
 for i = 1 to ll_cols
 	ls_col_id = "#"+string(i)
 	ls_col_name = idw_obj.describe( ls_col_id+".name" )
-	ls_col_dbname = idw_obj.describe( ls_col_id+".dbname" )
-	ls_col_type = idw_obj.describe( ls_col_id+".coltype" )
-	//'char(8)'
-	if idw_obj.describe( ls_col_id+".key" ) = 'yes' then ls_col_pk = 'updatewhereclause=yes' else ls_col_pk = ''
+	ls_type = idw_obj.describe( ls_col_name+".type" )
+	if ls_type = 'tableblob' then
+		ls_col_type = "blob"
+		ls_col_pk = ''
+		ls_syntax = idw_obj.describe("datawindow.syntax")
+		long ll_p1, ll_p2
+		ls_tmp = "name="+ls_col_name+" "
+		ll_p1 = pos( ls_syntax, ls_tmp )
+		//we hope that name is before dbname in cloumn( ) syntax!
+		if ll_p1 > 0 then
+			ll_p1 += len( ls_tmp )
+			ls_tmp = 'dbname="'
+			ll_p1 = pos( ls_syntax, ls_tmp, ll_p1 )
+			if ll_p1 > 0 then
+				ll_p1 += len( ls_tmp )
+				ll_p2 = pos(ls_syntax,'"', ll_p1 )
+				ls_col_dbname = mid( ls_syntax, ll_p1, ll_p2 - ll_p1 )
+			end if
+		else
+			ls_col_dbname = idw_obj.describe( ls_col_name+".dbname" )
+		end if
+		if ls_col_dbname="" or ls_col_dbname = "?" or ls_col_dbname = "!" then  ls_col_dbname = "object" //temporary hack...
+	else
+		ls_col_dbname = idw_obj.describe( ls_col_id+".dbname" )
+		ls_col_type = idw_obj.describe( ls_col_name+".coltype" )
+		if idw_obj.describe( ls_col_id+".key" ) = 'yes' then ls_col_pk = 'updatewhereclause=yes' else ls_col_pk = ''
+	end if
 		
 	ls_cols_def+= 'column=(type='+ls_col_type+' '+ls_col_pk+' name='+ls_col_name+' dbname="'+ls_col_dbname+'"  )' + CRLF
 	
@@ -727,15 +751,29 @@ for i = 1 to ll_cols
 	ll_width = 32 * ll_colsize
 	if ll_width > ll_max_width then ll_width = ll_max_width
 	//TODO: reflect original [ edit.style = DDDW, MASK, DDLB ; FORMAT etc... ] in a future version
-	ls_cols_header	+= 'text(name='+ls_col_name+'_t band=header font.charset="0" font.face="Tahoma" font.family="2" font.height="-8" font.italic="0" font.pitch="2" font.strikethrough="0" ' &
-						+ 'font.weight="400" font.underline="0"  background.mode="2" background.color="67108864" color="33554432" alignment="2" border="6" ' &
-						+ 'x="'+string(ll_h_x)+'" y="'+string(ll_h_y)+'" height="'+string(ll_h_height)+'" width="'+string(ll_width)+'" text="'+WordCap(ls_col_name)+'" ) ' + CRLF
-	ls_cols_field+= 'column(name='+ls_col_name+' band=detail id='+string(i)+' x="'+string(ll_x)+'" y="'+string(ll_y)+'" height="'+string(ll_height)+'" width="'+string(ll_width)+'" ' &
-				+ 'color="33554432" border="5" alignment="'+ls_col_align+'" format="[general]" edit.focusrectangle=no edit.autohscroll=yes edit.autoselect=yes edit.autovscroll=no edit.case=any '&
-				+ 'edit.codetable=no edit.displayonly=no edit.hscrollbar=no edit.imemode=0 edit.limit=0 edit.password=no edit.vscrollbar=no edit.validatecode=no edit.nilisnull=no '&
-				+ 'edit.required=no criteria.required=no criteria.override_edit=no crosstab.repeat=no background.mode="1" background.color="536870912" font.charset="0" '&
-				+ 'font.face="Tahoma" font.family="2" font.height="-8" font.italic="0" font.pitch="2" font.strikethrough="0" font.weight="400" font.underline="0" '&
-				+ 'tabsequence='+string( i * 10 )+' ) ' + CRLF
+	if ls_type = 'tableblob' then
+		ls_cols_field+= 'tableblob (band=detail ' &
+						+	'table="'+  idw_obj.describe( ls_col_name+".table" ) +'" '&
+						+	'keyclause="' +/* s(*/ idw_obj.describe( ls_col_name+".keyclause" )/*, '"', '~~"', 'g' )*/+ '" ' & 
+						+	'template="'+ /*s(*/ idw_obj.describe( ls_col_name+".template" )/*, '"', '~~"', 'g' )*/+'" ' &
+						+	'id='+string( i )+' ' &
+						+	'x="'+string(ll_h_x)+'" y="'+string(ll_h_y)+'" ' &
+						+	'height="'+string(ll_h_height)+'" width="'+string(ll_width)+'" ' &
+						+	'border="1"  ' &
+						+	'oleclass="'+ /*s(*/ idw_obj.describe( ls_col_name+".oleclass" )/*, '"', '~~"', 'g' )*/+'" ' &
+						+	'clientname='+ idw_obj.describe( ls_col_name+".clientname" ) +' ' &
+						+	'name=' + ls_col_name + ' visible="1" )' + CRLF
+	else
+		ls_cols_header	+= 'text(name='+ls_col_name+'_t band=header font.charset="0" font.face="Tahoma" font.family="2" font.height="-8" font.italic="0" font.pitch="2" font.strikethrough="0" ' &
+							+ 'font.weight="400" font.underline="0"  background.mode="2" background.color="67108864" color="33554432" alignment="2" border="6" ' &
+							+ 'x="'+string(ll_h_x)+'" y="'+string(ll_h_y)+'" height="'+string(ll_h_height)+'" width="'+string(ll_width)+'" text="'+WordCap(ls_col_name)+'" ) ' + CRLF
+		ls_cols_field+= 'column(name='+ls_col_name+' band=detail id='+string(i)+' x="'+string(ll_x)+'" y="'+string(ll_y)+'" height="'+string(ll_height)+'" width="'+string(ll_width)+'" ' &
+					+ 'color="33554432" border="5" alignment="'+ls_col_align+'" format="[general]" edit.focusrectangle=no edit.autohscroll=yes edit.autoselect=yes edit.autovscroll=no edit.case=any '&
+					+ 'edit.codetable=no edit.displayonly=no edit.hscrollbar=no edit.imemode=0 edit.limit=0 edit.password=no edit.vscrollbar=no edit.validatecode=no edit.nilisnull=no '&
+					+ 'edit.required=no criteria.required=no criteria.override_edit=no crosstab.repeat=no background.mode="1" background.color="536870912" font.charset="0" '&
+					+ 'font.face="Tahoma" font.family="2" font.height="-8" font.italic="0" font.pitch="2" font.strikethrough="0" font.weight="400" font.underline="0" '&
+					+ 'tabsequence='+string( i * 10 )+' ) ' + CRLF
+	end if
 next
 
 if tab_views.tabpage_data.pb_addcompute.flatstyle then
@@ -771,7 +809,7 @@ if tab_views.tabpage_data.pb_addcompute.flatstyle then
 	destroy lrx_objects
 end if
 
-dw_buffer.create('release 9; '+CRLF+&
+ls_syntax = 'release 9; '+CRLF+&
 'datawindow ( units=0 timer_interval=0 processing=1 color=1073741824 ) '+&
 'header(height=68 color="536870912" ) '+CRLF+&
 'summary(height=0 ) '+CRLF+&
@@ -779,7 +817,13 @@ dw_buffer.create('release 9; '+CRLF+&
 'detail(height=80  color="536870912" ) '+CRLF+&
 'table( '+ls_cols_def+' ) '+CRLF+&
 ls_cols_header +CRLF+&
-ls_cols_field +CRLF)
+ls_cols_field +CRLF
+dw_buffer.create(ls_syntax, ls_error )
+if ls_error <> "" then
+	if 1 = Messagebox( "create error", ls_error + CRLF + "Do you want to see syntax?", Question!, YesNo! ) then
+		Messagebox( "create syntax", ls_syntax )
+	end if
+end if
 //Messagebox("",'//dw_histo.createfromsql( "select describe as Command, cast( as varchar(8192)) as Expression" )')
 //dw_histo.modify('Datawindow.Detail.Color="0~tif(getrow()=currentrow(),rgb(255,255,0),1087434968)"')
 //dw_buffer.modify("datawindow.selected.mouse='no'")
@@ -1241,6 +1285,7 @@ end if
 
 super::event open()
 //Generate Code for resizer.
+//Uncomment this line in order to generate code that works without nv_auto_resizer
 //if ib_resize_handler then inv_resizer.of_generate_code( "", this )
 
 //LazyRefactoring

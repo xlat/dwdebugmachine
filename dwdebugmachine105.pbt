@@ -4,5 +4,5 @@ Save Format v3.0(19990112)
 @end;
 appname "dwdebugmachine105";
 applib "dwdebugmachine105.pbl";
-LibList "dwdebugmachine105.pbl;geni_dwdm105.pbl;pbnicw.pbd;pbnilist105.pbd;pbniregex105.pbd;powerfilter.pbd;embeddingperl105.pbd";
+LibList "dwdebugmachine105.pbl;geni_dwdm105.pbl;pbnicw.pbd;pbnilist105.pbd;pbniregex105.pbd;powerfilter.pbd;embeddingperl105d.pbd";
 type "pb";
